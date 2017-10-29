@@ -6,7 +6,7 @@ library(tidyr)
 
 library(ggplot2)
 
-source("analysis\\TempcyclesAnalysis.R")
+source("./analysis/TempcyclesAnalysis.R")
 
 #ROBOMUSSEL ANALYSIS
 
@@ -24,10 +24,10 @@ source("analysis\\TempcyclesAnalysis.R")
 
 #-----------------
 #Site data
-site.dat= read.csv("data\\musselREADME.csv")
+site.dat= read.csv("./data//musselREADME.csv")
 
 #Load robomussel data
-te.max <- readRDS("data\\tedat.rds")
+te.max <- readRDS("./data/tedat.rds")
 #te.max= read.csv("tedat.csv")
 
 #Fix duplicate CP in WA
@@ -50,9 +50,7 @@ te.max2= subset(te.max, te.max$site %in% c("SD","BB","PD") ) # "HS",
 # USWACC	48.5494	-123.0059667	Colins Cove
 # USWACP	48.45135	-122.9617833	Cattle Point
 #* USWASD	48.39136667	-124.7383667	Strawberry Point
-
 #* USORBB	44.83064	-124.06005	Boiler Bay
-
 #* USCAPD	35.66581667	-121.2867167	Piedras
 # USCAAG	34.46716667	-120.2770333	Alegria
 
@@ -73,6 +71,12 @@ te.max1= subset(te.max1, te.max1$doy>120 & te.max1$doy<274)
 fig2a<- ggplot(data=te.max1, aes(x=doy, y = MaxTemp_C, color=subsite ))+geom_line(alpha=0.8) +theme_bw()+
   facet_wrap(~lat, nrow=1)+ guides(color=FALSE)+labs(x = "Day of year",y="Maximum daily temperature (°C)")
 
+# AJI - Applied lowess smoothing to see the trends.
+fig2a_alt <-   te.max1 %>% as.data.frame() %>% ggplot(aes(doy,MaxTemp_C,group=subsite,color=subsite)) + 
+  stat_smooth(se = FALSE) + 
+  ggtitle("Maximum Temperatures by Latitude")+ theme_bw()+
+  facet_wrap(~lat, nrow=1)+ guides(color=FALSE)+
+  xlab("Day of year") + ylab("Maximum daily temperature (°C)")
 #------------------
 #FREQUENCY
 # https://github.com/georgebiogeekwang/tempcycles/
