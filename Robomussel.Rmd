@@ -1,3 +1,15 @@
+---
+title: "Robomussel Notebook"
+output: html_notebook
+---
+
+#ROBOMUSSEL ANALYSIS
+
+This is an [Robomussel Markdown](http://rmarkdown.rstudio.com) Notebook to analyze mussel intertidal data. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
 #load libraries
 library(plyr)
 library(dplyr)
@@ -7,9 +19,7 @@ library(tidyr)
 library(ggplot2)
 
 source("./analysis/TempcyclesAnalysis.R")
-
-#ROBOMUSSEL ANALYSIS
-
+```
 #SITES
 # WaOr Tatoosh Island, WA 1660.1 48.39 124.74
 # WaOr Boiler Bay, OR 1260.7 44.83 124.05
@@ -22,6 +32,8 @@ source("./analysis/TempcyclesAnalysis.R")
 # SoCal Alegria, CA 37.284 34.47 120.28
 # SoCal Coal Oil Point (COP), CA 0 34.41 119.88
 
+Load data
+```{r}
 #-----------------
 #Site data
 site.dat= read.csv("./data//musselREADME.csv")
@@ -29,16 +41,21 @@ site.dat= read.csv("./data//musselREADME.csv")
 #Load robomussel data
 te.max <- readRDS("./data/tedat.rds")
 #te.max= read.csv("tedat.csv")
+```
 
+
+
+```{r}
+#TODO Check the impact of NA and duplicates
 #Fix duplicate CP in WA
 te.max[which(te.max$lat==48.45135),"site"]<-"CPWA"
 
-#----------------------
-#PLOTS
+```
 
-#Time series
-#clim2 = clim2 %>% group_by(Year,Site) %>% summarise(Min= mean(Min, na.rm=TRUE),Max= mean(Max, na.rm=TRUE),Mean= mean(Mean, na.rm=TRUE) )
+#Analysis Plots
 
+Housekeeping first
+```{r}
 #count by site, subsite, year
 te.count = te.max %>% group_by(year,site, subsite) %>% summarise( count=length(MaxTemp_C)  )
 te.count= as.data.frame(te.count)
@@ -65,26 +82,34 @@ te.max1= subset(te.max1, te.max1$doy>120 & te.max1$doy<274)
 #ggplot(data=te.max1, aes(x=doy, y = MaxTemp_C, color=subsite ))+geom_line() +theme_bw()+facet_wrap(~site)
 #by tidal height
 #ggplot(data=te.max1, aes(x=doy, y = MaxTemp_C, color=height ))+geom_line() +theme_bw()+facet_wrap(~site)
+```
 
-#FIG 1A
-#by lat
+#Maximum selected temperatures for selected sites (by Latitude)
+```{r}
 fig2a<- ggplot(data=te.max1, aes(x=doy, y = MaxTemp_C, color=subsite ))+geom_line(alpha=0.8) +theme_bw()+
   facet_wrap(~lat, nrow=1)+ guides(color=FALSE)+labs(x = "Day of year",y="Maximum daily temperature (°C)")
+fig2a
+```
 
+Alt
 # AJI - Applied lowess smoothing to see the trends.
+```{r}
 fig2a_alt <-   te.max1 %>% as.data.frame() %>% ggplot(aes(doy,MaxTemp_C,group=subsite,color=subsite)) + 
   stat_smooth(se = FALSE) + 
   ggtitle("Maximum Temperatures by Latitude")+ theme_bw()+
   facet_wrap(~lat, nrow=1)+ guides(color=FALSE)+
   xlab("Day of year") + ylab("Maximum daily temperature (°C)")
-#------------------
-#FREQUENCY
-# https://github.com/georgebiogeekwang/tempcycles/
+fig2a_alt
+```
 
-#power spectrum
-#x: frequency (1/days)
-#y: log amplitude
+# Frequency Analysis -
 
+ https://github.com/georgebiogeekwang/tempcycles/
+ power spectrum
+ x: frequency (1/days)
+ y: log amplitude
+
+```{r}
 fseq= exp(seq(log(0.001), log(1), length.out = 400))
 
 sites= c("SD","BB","PD") #levels(te.max2$site)
@@ -134,15 +159,23 @@ site.dat1=  te.max %>% group_by(site) %>% summarise( lat=lat[1],zone=zone[1],tid
 match1= match(pow$site, site.dat1$site)
 pow$lat= site.dat1$lat[match1]
 
+```
+
+```{r}
 fig2b<- ggplot(data=pow, aes(x=log(freq), y = log(cyc_range/2), color=subsite))+geom_line(alpha=0.8) +theme_classic()+facet_wrap(~lat, nrow=1)+ guides(color=FALSE)+
  geom_vline(xintercept=-2.639, color="gray")+geom_vline(xintercept=-1.946, color="gray")+geom_vline(xintercept=-3.40, color="gray")+geom_vline(xintercept=-5.9, color="gray")+
 labs(x = "log (frequency) (1/days)",y="log (amplitude)")
-  
-#add lines for 1 week, 2 week, month, year
+
+#TODO #add lines for 1 week, 2 week, month, year
+fig2b
+```
 
 #===================================================
 #Quilt plot
 
+#Mean Daily maximum by Lat/Month
+
+```{r}
 #round lat
 te.max$lat.lab= round(te.max$lat,2)
 
@@ -157,9 +190,12 @@ fig2<- ggplot(te.month) +
   #scale_fill_distiller(palette="Spectral", na.value="white", name="max temperature (°C)") + 
   theme_bw(base_size = 18)+xlab("month")+ylab("latitude (°)")+ theme(legend.position="bottom") #+ coord_fixed(ratio = 4)
 
-#==================================================
-# EXTREMES
+fig2
+```
+#Extremes Analysis
 
+Load libraries
+```{r}
 library(ismev) #for gev
 library(reshape)
 library(maptools) #for mapping
@@ -167,6 +203,9 @@ library(evd) #for extremes value distributions
 library(extRemes)
 library(fExtremes) # generate gev
 
+```
+Housekeeping for Extremes
+```{r}
 sites= levels(te.max$site) #c("SD","BB","PD")
 subsites=  levels(te.max$subsite)
 
@@ -220,7 +259,10 @@ for(site.k in 1:length(sites))
 } #end sites
 
 #-------------------------
-#PLOT
+```
+
+Plot
+```{r}
 pow.out=gev.out
 
 dimnames(pow.out)[[1]]<- sites
@@ -267,15 +309,21 @@ pow1$var <- factor(pow1$var, labels = c("location", "scale", "shape", "percent a
 fig4= ggplot(data=pow1, aes(x=as.factor(lat), y = value, color=subsite))+geom_point()+
   theme_bw()+theme(axis.text.x=element_blank())+facet_wrap(~var, scales="free_y")+ guides(color=FALSE)+xlab("latitude (°C)")
 #as factor not latitude
+fig4
 
-#setwd("C:\\Users\\Buckley\\Google Drive\\Buckley\\Work\\ExtremesPhilTrans\\figures\\")
+```
 
-#file<-paste("AustGEV.pdf" ,sep="", collapse=NULL)
-#pdf(file,height = 8, width = 11)
+```{r}
 
+```
 
-#dev.off()
+```{r}
 
+```
+
+```{r}
+
+```
 
 
 
