@@ -11,7 +11,6 @@ library(shiny)
 library(dplyr)
 library(reshape2)
 library(tidyr)
-
 library(ggplot2)
 
 # Define server logic required to draw a histogram
@@ -41,10 +40,21 @@ shinyServer(function(input, output) {
   # #May 1 through September: 121:273 
   # te.max1<-subset(te.max1, te.max1$doy>120 & te.max1$doy<274)
   
+  theseSites = reactive(subset(te.max, te.max$location %in% c(input$sites)))
+  
+  points = reactive(theseSites()[,c("lon", 'lat')])
+  
+  output$map <- renderLeaflet({
+    leaflet() %>%
+      addProviderTiles(providers$Stamen.Terrain,
+                       options = providerTileOptions(noWrap = TRUE)
+      ) %>% addCircleMarkers(data = points())
+  })
+  
   output$climbPlot <- renderPlot({
     
-    ggplot(data=te.max1, aes(x=doy, y = MaxTemp_C, color=input$sites ))+geom_line(alpha=0.8) +theme_bw()+
-      facet_wrap(~lat, nrow=1)+ guides(color=FALSE)+labs(x = "Day of year",y="Maximum daily temperature (°C)")
+    ggplot(data=theseSites(), aes(x=doy, y = MaxTemp_C, color=subsite))+geom_line(alpha=0.8) +
+           theme_bw() + guides(color=FALSE)+labs(x = "Day of year",y="Maximum daily temperature (°C)") + facet_wrap(~location, ncol = 1)
     
   })
   

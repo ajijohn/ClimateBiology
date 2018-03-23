@@ -1,6 +1,4 @@
-# Rely on the 'WorldPhones' dataset in the datasets
-# package (which generally comes preloaded).
-
+library(leaflet)
 
 # Use a fluid Bootstrap layout
 fluidPage(    
@@ -13,15 +11,17 @@ fluidPage(
     
     # Define the sidebar with one input
     sidebarPanel(
-      selectInput("sites", "Sites:", 
-                  choices=unique(te.max1$site)),
+      checkboxGroupInput("sites", "Sites:", 
+                  choices=unique(te.max$location)),
       hr(),
-      helpText("Data from Hemuth et. al.")
+      helpText("Data from Hemuth et. al."), 
+      hr(), 
+      leafletOutput('map')
     ),
     
     # Create a spot for ggplot
     mainPanel(
-      plotOutput("climbPlot")  
+      plotOutput("climbPlot", height="800px")  
     )
     
   )
