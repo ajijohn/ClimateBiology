@@ -13,7 +13,7 @@ fluidPage(
     
     # Define the sidebar with one input
     sidebarPanel(
-      selectInput("sites", "Sites:", 
+      checkboxGroupInput("sites", "Sites:", 
                   choices=unique(te.max1$site)),
       hr(),
       helpText("Data from Hemuth et. al.")
@@ -21,7 +21,7 @@ fluidPage(
     
     # Create a spot for ggplot
     mainPanel(
-      plotOutput("climbPlot")  
+      plotOutput("climbPlot", height="800px")  
     )
     
   )
