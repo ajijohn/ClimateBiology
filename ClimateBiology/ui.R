@@ -1,6 +1,4 @@
-# Rely on the 'WorldPhones' dataset in the datasets
-# package (which generally comes preloaded).
-
+library(leaflet)
 
 # Use a fluid Bootstrap layout
 fluidPage(    
@@ -16,7 +14,9 @@ fluidPage(
       checkboxGroupInput("sites", "Sites:", 
                   choices=unique(te.max$location)),
       hr(),
-      helpText("Data from Hemuth et. al.")
+      helpText("Data from Hemuth et. al."), 
+      hr(), 
+      leafletOutput('map')
     ),
     
     # Create a spot for ggplot
