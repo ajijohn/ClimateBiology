@@ -14,7 +14,7 @@ fluidPage(
     # Define the sidebar with one input
     sidebarPanel(
       checkboxGroupInput("sites", "Sites:", 
-                  choices=unique(te.max1$site)),
+                  choices=unique(te.max$location)),
       hr(),
       helpText("Data from Hemuth et. al.")
     ),

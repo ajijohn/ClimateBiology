@@ -43,8 +43,8 @@ shinyServer(function(input, output) {
   
   output$climbPlot <- renderPlot({
     
-    ggplot(data=subset(te.max1, te.max1$site %in% c(input$sites)), aes(x=doy, y = MaxTemp_C, color=subsite))+geom_line(alpha=0.8) +
-           theme_bw() + guides(color=FALSE)+labs(x = "Day of year",y="Maximum daily temperature (°C)") + facet_wrap(~site, ncol = 1)
+    ggplot(data=subset(te.max, te.max$location %in% c(input$sites)), aes(x=doy, y = MaxTemp_C, color=subsite))+geom_line(alpha=0.8) +
+           theme_bw() + guides(color=FALSE)+labs(x = "Day of year",y="Maximum daily temperature (°C)") + facet_wrap(~location, ncol = 1)
     
   })
   
