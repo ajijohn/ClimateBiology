@@ -10,7 +10,8 @@ te.max <- readRDS("tedat.rds")
 
 #Load meta for names
 te.meta <- read.csv("musselREADME.csv")
-namemap = unique(meta[,c("location", "latitude")])
+te.meta = te.meta %>% mutate(location=paste0(location, ", ", region))
+namemap = unique(te.meta[,c("location", "latitude")])
 
 # add location names
 te.max = te.max %>% left_join(namemap, c('lat' = 'latitude'))
