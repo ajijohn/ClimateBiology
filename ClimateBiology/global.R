@@ -26,7 +26,7 @@ te.max2 <- subset(te.max, te.max$site %in% c("SD","BB","PD") ) # "HS",
 
 
 #time series
-te.max1<-subset(te.max2, te.max2$year==2002)
+te.max1<-subset(te.max, te.max$year==2002)
 
 #restrict to summer
 #May 1 through September: 121:273 
